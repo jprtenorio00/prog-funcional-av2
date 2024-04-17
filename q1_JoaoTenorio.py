@@ -3,7 +3,9 @@
 # Disciplina: Programação Funcional
 # Avaliação: AV2
 
-import sys
+import os
+
+os.system('cls')
 
 class Customer:
     def __init__(self, user):
@@ -26,7 +28,7 @@ class User:
     def debit_balance(self, amount):
         check_balance = lambda balance, amt: balance - amt if balance >= amt else balance
         self.balance = check_balance(self.balance, amount)
-        return self.balance != amount
+        return self.balance!= amount
 
 class Transaction:
     def __init__(self, user):
@@ -68,13 +70,21 @@ class Cashier:
 
     def process_transfer(self, amount):
         print("Providenciando detalhes do depósito bancário")
-        process = lambda: self.receive_cash(amount) if self.bank_confirmation() else (self.transaction.cancel_transaction(), False)[1]
-        return process()
+        if self.bank_confirmation():
+            print("Transação completa.")
+            return True
+        else:
+            print("Transação cancelada.")
+            return False
 
     def process_credit(self, amount):
-        print("Recolhendo dados de crédito da conta")
-        process = lambda: self.receive_cash(amount) if self.bank_confirmation() else (self.transaction.cancel_transaction(), False)[1]
-        return process()
+        print("Requisitando detalhes da conta de crédito")
+        if self.bank_confirmation():
+            print("Transação completa.")
+            return True
+        else:
+            print("Transação cancelada.")
+            return False
 
     def bank_confirmation(self):
         response = input("O pagamento foi confirmado pelo banco? (sim/não): ").lower()
