@@ -1,3 +1,8 @@
+# Autor: João Pedro Rodrigues Tenório
+# Matrícula: 1810518
+# Disciplina: Programação Funcional
+# Avaliação: AV2
+
 import os
 
 os.system('cls')
