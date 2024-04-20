@@ -68,5 +68,3 @@ db.commit()
 
 print_data = (lambda tables: [select_from(table, "1=1") or print(f"Data from {table}:") or [print(row) for row in cursor] for table in tables])
 print_data(["USERS", "VIDEOGAMES", "GAMES", "COMPANY"])
-
-db.close()
