@@ -5,41 +5,39 @@
 
 import unittest
 from unittest.mock import patch
-from q1_JoaoTenorio import User, Customer, system_login, Transaction, Cashier
+from q1_JoaoTenorio import User, Customer, system_login, main
 
 class TestPaymentSystem(unittest.TestCase):
     def setUp(self):
-        # Usuários de teste
-        create_users = lambda: [
-            User("tenorio", "12345", "João Tenório", 1000),
-            User("samuel", "54321", "Samuel Lincoln", 500)
-        ]
-        self.users = create_users()
+        self.users = (lambda: [
+            User(username="tenorio", password="12345", name="João Tenório", balance=1000),
+            User(username="samuel", password="54321", name="Samuel Lincoln", balance=500),
+            User(username="lucas", password="123", name="Lucas", balance=100)
+        ])()
 
-    @patch('builtins.input', side_effect=["tenorio", "12345"])
-    def test_login_success(self, mocked_input):
-        print("Testar login bem-sucedido")
-        user = system_login(self.users)
-        self.assertEqual(user, self.users[0])
+    @patch('builtins.input', side_effect=['tenorio', '12345'])
+    def test_successful_login(self, mock_inputs):
+        user = (lambda: system_login(self.users))()
+        assertions = (lambda u: (
+            self.assertIsNotNone(u),
+            self.assertEqual(u.name(), 'João Tenório')
+        ))(user)
 
-    @patch('builtins.input', side_effect=["tenorio", "senhaerrada"])
-    def test_login_failure(self, mocked_input):
-        print("Testar falha no login")
-        user = system_login(self.users)
-        self.assertIsNone(user)
+    @patch('builtins.input', side_effect=['tenorio', '40028922'])
+    def test_failed_login(self, mock_inputs):
+        user = (lambda: system_login(self.users))()
+        assertion = (lambda u: self.assertIsNone(u))(user)
 
-    @patch('builtins.input', side_effect=["sim"])
-    def test_bank_confirmation_success(self, mocked_input):
-        print("Testar confirmação do banco com sucesso")
-        create_cashier = lambda: Cashier(Transaction(self.users[0]))
-        cashier = create_cashier()
-        result = cashier.bank_confirmation()
-        self.assertTrue(result)
+    @patch('builtins.input', side_effect=['sim'])
+    def test_bank_confirmation_success(self, mock_inputs):
+        logged_user = (lambda: self.users[0])()
+        customer = (lambda: Customer(logged_user))()
+        transaction_success = (lambda: customer.initiate_transaction(100, 'transferência'))()
+        assertion = (lambda success: self.assertTrue(success))(transaction_success)
 
-    def system_login(users, entered_username, entered_password):
-        check_login = lambda user: user.verify_login(entered_username, entered_password)()
-        valid_users = [user for user in users if check_login(user)]
-        return valid_users[0] if valid_users else print("Falha no login. Por favor, verifique seu usuário e senha.") or None
+    @patch('builtins.input', side_effect=['tenorio', '40028922'] * 10)
+    def test_stress_login_failure(self, mock_inputs):
+        assertions = (lambda tests: [self.assertIsNone(system_login(self.users)) for _ in tests])(range(10))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
